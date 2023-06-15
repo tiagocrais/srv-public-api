@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/consulta/cep")
+@RequestMapping("/api/consulta/cep")
 public class CepController {
 
     @Autowired
