@@ -1,9 +1,11 @@
 package br.com.tiagocrais.publi.api.service.gateway;
 
 import br.com.tiagocrais.publi.api.service.exception.CepException;
+import br.com.tiagocrais.publi.api.service.model.request.EnderecoRequest;
 import br.com.tiagocrais.publi.api.service.model.response.ViaCepDtoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.netty.http.client.HttpClient;
 
 import java.net.URI;
+import java.util.List;
 
 @Service
 public class CepGateway {
@@ -46,6 +49,46 @@ public class CepGateway {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(ViaCepDtoResponse.class)
+                    .block();
+
+        } catch (CepException e) {
+
+            logger.error("ERRO: {} - {}", viaCepHost, e);
+            throw new CepException(
+                    e.getMessage(),
+                    ERROR_CODE_VIA_CEP + e.getStatusCode(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value()
+            );
+
+        } catch (Exception e) {
+
+            logger.error("ERRO: {} - {}", viaCepHost, e);
+            throw new CepException(
+                    e.getMessage(),
+                    ERROR_CODE_SRV,
+                    HttpStatus.INTERNAL_SERVER_ERROR.value()
+            );
+        }
+    }
+
+    public List<ViaCepDtoResponse> consultarCepPorEndereco(EnderecoRequest request) {
+
+        try {
+
+            logger.info("Iniciando chamada em {}{} com o endereço: {}", viaCepHost, viaCepPath, request);
+
+            URI uri = UriComponentsBuilder.fromHttpUrl(viaCepHost.concat(viaCepPath)
+                            .concat(request.getUf()).concat("/")
+                            .concat(request.getCidade()).concat("/")
+                            .concat(request.getLogradouro())
+                            .concat("/json/"))
+                            .build()
+                            .toUri();
+
+            return getWebClient().get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ViaCepDtoResponse>>() {})
                     .block();
 
         } catch (CepException e) {
