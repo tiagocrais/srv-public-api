@@ -1,5 +1,6 @@
 package br.com.tiagocrais.publi.api.service.usecase;
 
+import br.com.tiagocrais.publi.api.service.exception.CepNotFoundException;
 import br.com.tiagocrais.publi.api.service.gateway.CepGateway;
 import br.com.tiagocrais.publi.api.service.model.response.CepResponse;
 import br.com.tiagocrais.publi.api.service.model.response.ViaCepDtoResponse;
@@ -24,6 +25,10 @@ public class CepUseCase {
 
         ViaCepDtoResponse retorno = cepGateway.consultarCepPorId(cep);
         logger.info("Retorno da consulta do CEP: {} com o endereço: {}", cep, retorno);
+
+        if (retorno.getCep() == null) {
+            throw new CepNotFoundException("Cep retornou null!");
+        }
 
         return mapper(retorno);
     }
