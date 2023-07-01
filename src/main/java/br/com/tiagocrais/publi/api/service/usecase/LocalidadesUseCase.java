@@ -21,6 +21,8 @@ public class LocalidadesUseCase {
 
     public List<PaisesIbgeResponse> consultarPaises(List<PaisRequest> paises) {
 
+        this.upperFirstLetter(paises);
+
         List<PaisesIbgeResponse> retornoIbge = localidadesGateway.consultarPaises();
         logger.info("Retorno da consulta com os paises: {}", retornoIbge);
 
@@ -31,5 +33,15 @@ public class LocalidadesUseCase {
         logger.info("Paises filtrados: {} ", paisesFiltrados);
 
         return paisesFiltrados;
+    }
+
+    private void upperFirstLetter(List<PaisRequest> paises) {
+
+        paises.forEach(paisRequest -> {
+            String nome = paisRequest.getNome();
+            String nomePrimeiraLetraMaiuscula = nome.substring(0, 1).toUpperCase()
+                    + nome.substring(1);
+            paisRequest.setNome(nomePrimeiraLetraMaiuscula);
+        });
     }
 }
