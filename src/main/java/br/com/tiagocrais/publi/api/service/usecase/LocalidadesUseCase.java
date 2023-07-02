@@ -28,7 +28,7 @@ public class LocalidadesUseCase {
 
         List<PaisesIbgeResponse> paisesFiltrados = retornoIbge.stream()
                 .filter(paisIbgeResponse -> paises.stream()
-                        .anyMatch(paisRequest -> paisRequest.getNome().equals(paisIbgeResponse.getNome())))
+                        .anyMatch(paisRequest -> paisIbgeResponse.getNome().contains(paisRequest.getNome())))
                 .collect(Collectors.toList());
         logger.info("Paises filtrados: {} ", paisesFiltrados);
 
